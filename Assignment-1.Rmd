@@ -1,0 +1,91 @@
+---
+title: "ADM Assignment-1"
+author: "Akshaya Mamidipalli"
+date: "2024-03-11"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ISLR)
+library(dplyr)
+```
+
+
+```{r}
+library(glmnet)
+```
+
+```{r}
+library(caret)
+```
+
+```{r}
+Carseats_Filtered <- Carseats %>% select("Sales", "Price","Advertising","Population","Age","Income","Education")
+```
+
+```{r}
+Carseats_Filtered_Normalized <- scale(Carseats_Filtered)
+X <- as.matrix(Carseats_Filtered_Normalized[, c('Price','Advertising','Population','Age','Income','Education')])
+Y <- Carseats_Filtered_Normalized[,'Sales']
+fit.lasso <- glmnet(X,Y,alpha = 1)
+plot(fit.lasso,xvar = "lambda")
+
+```
+
+
+#QB1)
+
+```{r}
+lasso_model <- cv.glmnet(X,Y, alpha = 1)
+plot(lasso_model)
+
+```
+```{r}
+best_value <- lasso_model$lambda.min
+best_value
+```
+The best value of the lambda for the lasso- regression model is 0.0015
+
+#QB2)
+
+```{r}
+coef(fit.lasso, s=best_value)
+```
+The coefficient for the price (normalized) attribute in the best model is -4.79 * 10^-1
+
+#QB3)
+```{r}
+coef(fit.lasso, s=0.01)
+```
+```{r}
+coef(fit.lasso, s=0.1)
+```
+When the lambda value is set to 0.01, all the attributes remaining in the model with non-zero coefficients.
+Nevertheless, the number of attributes with non-zero coefficients drops to four if the lambda value is raised to 0.1. 'Population' and 'Education' attributes are eliminated from the model because their coefficients are practically zero.
+
+#QB4)
+
+```{r}
+fit.elastic <- glmnet(X,Y,alpha = 0.6)
+plot(fit.elastic,xvar = "lambda")
+
+```
+
+```{r}
+elastic_model <- cv.glmnet(X,Y, alpha = 0.6)
+plot(elastic_model)
+
+```
+```{r}
+best_value_elastic <- elastic_model$lambda.min
+best_value_elastic
+
+```
+The best value of the lambda for an elastic-net model is 0.0023
+
